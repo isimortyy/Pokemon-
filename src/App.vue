@@ -38,7 +38,7 @@
                 <div class="text-center">{{ stat.label }}: {{ formatValue(stat.value) }}%</div>
                 <q-linear-progress 
                   :value="stat.value / 100" 
-                  color="purple"
+                  color="black"
                   size="1em"
                   track-color="grey-3"
                   animated
@@ -49,15 +49,18 @@
           <div class="col-4 relative-position">
             <div class="idPokemon">#{{ pokemon.id }}</div>
             <img :src="pokemon.imagen" alt="Imagen del Pokémon" class="pokemon-imagen">
-            <div class="row q-mt-md">
-              <div class="col text-center">
+            <div class="caracteristicas">
+              <div class="caracteristicas_2">
                 <p><strong>Altura:</strong> {{ pokemon.altura }} dm</p>
               </div>
-              <div class="col text-center">
-                <p><strong>Peso:</strong> {{ pokemon.peso }} hg</p>
+              <div class="caracteristicas_2">
+                <p><strong>Peso:</strong> {{ pokemon.peso }} kg</p>
               </div>
-              <div class="col text-center">
-                <p><strong>Tipo:</strong> {{ pokemon.tipo }}</p>
+              <div class="caracteristicas_2">
+                <p><strong>Tipo:</strong></p>
+                <div class="tipos">
+                  <span v-for="tipo in tipos" :key="tipo" :style="{ backgroundColor: tipoColorMap[tipo] }" class="tipo">{{ tipo }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -144,6 +147,8 @@ const stats = ref([
   { label: "Velocidad", value: 0 }
 ]);
 
+const tipos = ref([]);
+
 function formatValue(value) {
   return value.toFixed(0);
 }
@@ -175,7 +180,8 @@ async function buscarPokemon() {
     const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${texto.value.toLowerCase()}`);
     const pokemonData = response.data;
     
-    const tipoEnEspañol = pokemonData.types.map(type => tipoMap[type.type.name]).join(", ");
+    const tipoEnEspañol = pokemonData.types.map(type => tipoMap[type.type.name]);
+    tipos.value = tipoEnEspañol;
     
     const statsData = {};
     pokemonData.stats.forEach(stat => {
@@ -197,7 +203,7 @@ async function buscarPokemon() {
       id: pokemonData.id,
       altura: pokemonData.height,
       peso: pokemonData.weight,
-      tipo: tipoEnEspañol
+      tipo: tipoEnEspañol.join(", ")
     };
   } catch (error) {
     console.error("Error al buscar el Pokémon:", error);
@@ -237,8 +243,8 @@ async function buscarPokemon() {
   font-size: 8rem;
   opacity: 0.3;
   position: absolute;
-  top: 20%;
-  left: -10%;
+  top: 30%;
+  left: -40%;
   transform: translate(-50%, -50%);
   z-index: 0;
 }
@@ -247,6 +253,23 @@ async function buscarPokemon() {
   font-family: 'Press Start 2P', sans-serif;
   font-size: 2rem;
   margin-bottom: 1rem;
+}
+
+.col-8 {
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 16px;
+}
+
+.caracteristicas {
+  font-family: 'Press Start 2P', sans-serif;
+}
+
+.tipo {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border: 2px solid black; /* Borde negro */
+  border-radius: 4px;
+  margin: 0.2rem;
 }
 
 @media (max-width: 600px) {
